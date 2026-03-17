@@ -1,0 +1,8 @@
+{
+  "min_path_corr_gain": 0.01,
+  "min_path_sign_gain": 0.002,
+  "min_path_mse_reduction": 0.05,
+  "max_all978_drop": 0.01,
+  "max_top50_drop": 0.02
+}
+

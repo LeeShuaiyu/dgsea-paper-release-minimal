@@ -1,0 +1,22 @@
+# Copy this file to `release_paths.yaml` and edit local absolute/relative paths.
+
+seed: 42
+
+data:
+  l1000_parquet: "data/raw/smiles_signatures.parquet"
+  split_index_npz: "data/processed/split_seed42.npz"
+  pathway_definition_json: "data/processed/pathways_5.json"
+
+model:
+  chemberta_dir: "seyonec/ChemBERTa-zinc-base-v1"
+  device: "cpu"
+  filter_invalid_smiles: 1
+  use_fp: 0
+
+results:
+  run_dir: "runs/chemberta_exp3a"
+  core_table_csv: "results/training_repro/exp3a_table_test_models_core.csv"
+  conclusion_report_json: "results/training_repro/conclusion_check.json"
+
+check:
+  thresholds_json: "configs/conclusion_thresholds.json"

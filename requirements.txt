@@ -1,0 +1,14 @@
+numpy>=1.23
+scipy>=1.10
+pandas>=2.0
+scikit-learn>=1.2
+matplotlib>=3.7
+seaborn>=0.12
+jupyterlab>=4.0
+ipykernel
+torch>=2.2
+transformers>=4.40
+tokenizers>=0.15
+tqdm>=4.66
+pyarrow>=14
+rdkit>=2023.9

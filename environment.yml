@@ -1,0 +1,21 @@
+name: dgsea-release
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy>=1.23
+  - scipy>=1.10
+  - pandas>=2.0
+  - pyarrow>=14
+  - scikit-learn>=1.2
+  - matplotlib>=3.7
+  - seaborn>=0.12
+  - tqdm>=4.66
+  - jupyterlab>=4.0
+  - ipykernel
+  - pytorch>=2.2
+  - transformers>=4.40
+  - tokenizers>=0.15
+  - rdkit>=2023.9
+  - pip

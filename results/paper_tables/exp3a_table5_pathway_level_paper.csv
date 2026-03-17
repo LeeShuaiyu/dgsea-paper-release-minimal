@@ -1,0 +1,4 @@
+objective,correlation,mse,sign_accuracy
+Baseline,0.196,1.907,0.619
+DGSEA-only,0.073,6.234,0.598
+Hybrid (ours),0.233,1.744,0.631

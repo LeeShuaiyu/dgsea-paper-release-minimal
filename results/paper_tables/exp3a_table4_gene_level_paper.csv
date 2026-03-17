@@ -1,0 +1,4 @@
+objective,mean_r,rmse,top50_r,top50_rmse
+Baseline,0.443,0.421,0.783,1.017
+DGSEA-only,0.292,30.429,0.639,34.226
+Hybrid (ours),0.445,0.420,0.784,1.015

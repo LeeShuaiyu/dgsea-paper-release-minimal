@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.executed.ipynb
+notebooks/runs/
+notebooks/results/
+
+# Local environment
+.venv/
+.venv*/
+venv/
+.env
+
+# OS
+.DS_Store
+
+# Large / generated artifacts
+runs/
+results/generated/*
+!results/generated/.gitkeep
+results/training_repro/*.tmp*
+results/training_repro/*.log
+results/paper_tables/*.tmp*
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.ckpt
+data/raw/
+data/processed/
