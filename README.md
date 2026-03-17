@@ -1,4 +1,4 @@
-# dGSEA Paper Release
+# dGSEA Paper Code
 
 This repository is a publication-oriented, **training-reproducible** release for dGSEA experiments.
 
