@@ -4,11 +4,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 
-Official implementation of **"Differentiable Gene Set Enrichment Analysis for Pathway-Level Supervision in Transcriptomic Learning"** (Li et al., 2025).
+Official implementation of **"Differentiable Gene Set Enrichment Analysis for Pathway-Level Supervision in Transcriptomic Learning"** (Li et al., 2026).
 
 ---
 
 ## Overview
+
+<p align="center">
+  <img src="figures/fig1.png" width="700" alt="Objective mismatch and dGSEA overview"/>
+</p>
 
 Transcriptomic prediction models are trained with gene-level objectives (MSE, Pearson correlation) but evaluated via pathway-level statistics such as Gene Set Enrichment Analysis (GSEA). This objective–functional mismatch causes unreliable pathway conclusions under imperfect prediction.
 
@@ -20,9 +24,17 @@ Transcriptomic prediction models are trained with gene-level objectives (MSE, Pe
 | Discrete prefix accumulation | Smooth sigmoid prefix kernel |
 | Extremum selection | Softmax-weighted aggregation |
 
+<p align="center">
+  <img src="figures/fig2.png" width="700" alt="dGSEA differentiable pipeline"/>
+</p>
+
 Sign-specific robust permutation normalization (**dNES**) preserves the statistical semantics of the classical normalized enrichment score. A Nyström–windowing approximation (**nyswin**) reduces the naive O(G²) complexity to near-linear, enabling genome-scale integration into training loops.
 
 When used as an auxiliary objective for SMILES-to-transcriptome prediction on LINCS L1000, dGSEA improves pathway-level agreement without sacrificing gene-level fidelity:
+
+<p align="center">
+  <img src="figures/fig3.png" width="700" alt="Training pipeline with dGSEA supervision"/>
+</p>
 
 | Metric | Baseline | + dGSEA |
 |---|---|---|
@@ -114,7 +126,7 @@ dgsea-paper-code/
 If you use dGSEA in your work, please cite:
 
 ```bibtex
-@article{li2025dgsea,
+@article{li2026dgsea,
   title   = {Differentiable Gene Set Enrichment Analysis for Pathway-Level Supervision
              in Transcriptomic Learning},
   author  = {Li, Shuaiyu and Ruan, Yang and Yang, Xinyue and Zhang, Wen and Saigo, Hiroto},
