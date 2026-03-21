@@ -1,19 +1,156 @@
 # dGSEA Paper Code
 
-This repository is a publication-oriented, **training-reproducible** release for dGSEA experiments.
+Publication-oriented, training-reproducible release for **dGSEA**, a differentiable GSEA framework for pathway-level supervision in transcriptomic learning.
 
-It contains:
-- 3 core method files (`dgsea_core.py`, `dgsea_torch.py`, `dgsea_backend.py`)
-- 1 de-duplicated training notebook (`exp3a_release_repro.ipynb`) covering MSE-only, DGSEA-only, and Hybrid training/evaluation
-- scripts for one-command execution and conclusion-consistency checks
+dGSEA addresses the mismatch between **gene-level training objectives** and **pathway-level interpretation**. It turns classical GSEA into a training-compatible objective by replacing hard ranking, discrete prefix accumulation, and hard extremum selection with smooth differentiable relaxations.
 
-## Scope
+This repository is designed for **paper-level reproducibility**: from algorithm sanity checks to training runs, result tables, and conclusion-consistency validation.
 
-This release supports two reproducibility levels:
-1. **Algorithm sanity reproducibility** (CPU-friendly smoke test)
-2. **Training reproducibility** (from data to model comparison table, then conclusion check)
+## What is included
+
+- **Core implementation**
+  - `src/dgsea_core.py`
+  - `src/dgsea_torch.py`
+  - `src/dgsea_backend.py`
+- **Training notebook**
+  - `notebooks/exp3a_release_repro.ipynb`
+- **Reproducibility scripts**
+  - one-command training reproduction
+  - smoke tests
+  - conclusion-consistency checks
+  - comparison against paper tables
+- **Release assets**
+  - configs
+  - paper reference tables
+  - reproducibility notes
+
+## Quick Start
+
+### 1. Environment setup
+
+#### Conda
+
+```bash
+conda env create -f environment.yml
+conda activate dgsea-release
+```
+
+#### CPU-only (macOS / no GPU)
+
+```bash
+python3 -m venv .venv_repro
+. .venv_repro/bin/activate
+pip install -U pip
+pip install -r requirements-cpu.txt
+```
+
+If RDKit installation fails in your platform-specific pip environment, use the Conda setup or run training with:
+
+```bash
+--filter-invalid-smiles 0 --use-fp 0
+```
+
+### 2. Smoke test
+
+```bash
+python scripts/smoke_test.py
+```
+
+### 3. Full training reproduction
+
+```bash
+python scripts/run_training_repro.py \
+  --data-path /abs/path/to/smiles_signatures.parquet \
+  --model-dir /abs/path/to/ChemBERTa \
+  --local-files-only \
+  --device cpu \
+  --batch-size 16 \
+  --epochs-mse 5 \
+  --epochs-dgsea 5 \
+  --epochs-hybrid 4 \
+  --filter-invalid-smiles 1 \
+  --use-fp 0 \
+  --check-conclusion
+```
+
+### 4. Fast CPU pilot run
+
+```bash
+python scripts/run_training_repro.py \
+  --data-path /abs/path/to/smiles_signatures.parquet \
+  --model-dir /abs/path/to/ChemBERTa \
+  --local-files-only \
+  --device cpu \
+  --max-samples 4000 \
+  --batch-size 8 \
+  --epochs-mse 2 \
+  --epochs-dgsea 2 \
+  --epochs-hybrid 2 \
+  --filter-invalid-smiles 0 \
+  --use-fp 0
+```
+
+If you intentionally want online model download, use for example:
+
+```bash
+--model-dir seyonec/ChemBERTa-zinc-base-v1 --allow-hf-download
+```
+
+## Reproducibility
+
+This release supports two levels of reproducibility:
+
+1. **Algorithm sanity reproducibility**  
+   CPU-friendly smoke tests for core method behavior.
+
+2. **Training reproducibility**  
+   From data and model inputs to reproduced result tables and conclusion checks.
 
 The target is **conclusion-level consistency** (trend and relative improvements), not bitwise-identical checkpoints.
+
+### Required inputs
+
+- **L1000 parquet file** containing SMILES and `gene_*` columns  
+  example: `data/raw/smiles_signatures.parquet`
+- **ChemBERTa model source**
+  - local folder via `--model-dir` (recommended), or
+  - HuggingFace model id with explicit `--allow-hf-download`
+- **RDKit** for strict paper-style preprocessing (`--filter-invalid-smiles 1`)
+
+### Outputs
+
+After training reproduction, the main outputs are:
+
+- `results/training_repro/exp3a_table_test_models_core.csv`
+- `results/training_repro/exp3a_table_test_per_pathway.csv`
+- `results/training_repro/conclusion_check.json` (if checker is enabled)
+
+Notebook artifacts and checkpoints are written under `OUT_DIR` (default: `runs/chemberta_exp3a`).
+
+Reference manuscript tables are provided under:
+
+- `results/paper_tables/exp3a_table4_gene_level_paper.csv`
+- `results/paper_tables/exp3a_table5_pathway_level_paper.csv`
+
+### Validation
+
+Run the standalone conclusion checker:
+
+```bash
+python scripts/check_conclusion_consistency.py \
+  --core-table results/training_repro/exp3a_table_test_models_core.csv
+```
+
+Compare reproduced metrics against manuscript reference tables:
+
+```bash
+python scripts/compare_with_paper_tables.py \
+  --core-table results/training_repro/exp3a_table_test_models_core.csv
+```
+
+Default thresholds are defined in:
+
+- `configs/conclusion_thresholds.json`
 
 ## Repository Structure
 
@@ -49,151 +186,16 @@ dgsea-paper-release/
 └── .gitignore
 ```
 
-## Environment Setup
+## Notes
 
-### Conda
-
-```bash
-conda env create -f environment.yml
-conda activate dgsea-release
-```
-
-### CPU-only (macOS, no GPU)
-
-```bash
-python3 -m venv .venv_repro
-. .venv_repro/bin/activate
-pip install -U pip
-pip install -r requirements-cpu.txt
-```
-
-If RDKit installation fails in your platform-specific pip environment, use the Conda setup or run training with:
-`--filter-invalid-smiles 0 --use-fp 0`.
-
-## Data and Model Prerequisites
-
-Required for training notebook execution:
-- L1000 parquet file (SMILES + `gene_*` columns), e.g. `data/raw/smiles_signatures.parquet`
-- ChemBERTa model source:
-  - local folder via `--model-dir` (recommended), or
-  - HuggingFace model id with explicit `--allow-hf-download`
-- RDKit for strict paper-style preprocessing (`--filter-invalid-smiles 1`).
-
-## Training Reproducibility (Recommended Entry)
-
-Run full notebook execution non-interactively:
-
-```bash
-python scripts/run_training_repro.py \
-  --data-path /abs/path/to/smiles_signatures.parquet \
-  --model-dir /abs/path/to/ChemBERTa \
-  --local-files-only \
-  --device cpu \
-  --batch-size 16 \
-  --epochs-mse 5 \
-  --epochs-dgsea 5 \
-  --epochs-hybrid 4 \
-  --filter-invalid-smiles 1 \
-  --use-fp 0 \
-  --check-conclusion
-```
-
-For faster CPU pilot runs (trend check):
-
-```bash
-python scripts/run_training_repro.py \
-  --data-path /abs/path/to/smiles_signatures.parquet \
-  --model-dir /abs/path/to/ChemBERTa \
-  --local-files-only \
-  --device cpu \
-  --max-samples 4000 \
-  --batch-size 8 \
-  --epochs-mse 2 \
-  --epochs-dgsea 2 \
-  --epochs-hybrid 2 \
-  --filter-invalid-smiles 0 \
-  --use-fp 0
-```
-
-For pilot runs, run `--check-conclusion` only if `max-samples` is large enough; tiny subsets can fail threshold checks by noise.
-
-If you intentionally want online model download, use for example:
-
-```bash
---model-dir seyonec/ChemBERTa-zinc-base-v1 --allow-hf-download
-```
-
-## Outputs
-
-After training notebook execution:
-- `results/training_repro/exp3a_table_test_models_core.csv`
-- `results/training_repro/exp3a_table_test_per_pathway.csv`
-- `results/training_repro/conclusion_check.json` (if checker is run)
-
-Notebook artifacts and checkpoints are written under `OUT_DIR` (default: `repository-root/runs/chemberta_exp3a`).
-When `run_training_repro.py` is used, export paths are resolved to repository-absolute locations to avoid notebook working-directory drift.
-
-Reference manuscript tables are provided under:
-- `results/paper_tables/exp3a_table4_gene_level_paper.csv`
-- `results/paper_tables/exp3a_table5_pathway_level_paper.csv`
-
-## Conclusion Consistency Check
-
-Standalone check:
-
-```bash
-python scripts/check_conclusion_consistency.py \
-  --core-table results/training_repro/exp3a_table_test_models_core.csv
-```
-
-Default thresholds are in:
-- `configs/conclusion_thresholds.json`
-
-The checker validates that Hybrid remains better on key pathway metrics while gene-level quality does not collapse.
-
-Compare reproduced metrics against manuscript reference tables:
-
-```bash
-python scripts/compare_with_paper_tables.py \
-  --core-table results/training_repro/exp3a_table_test_models_core.csv
-```
-
-## Smoke Test
-
-Core-method smoke test (no real data required):
-
-```bash
-python scripts/smoke_test.py
-```
-
-Reduced notebook smoke test (requires real data):
-
-```bash
-python scripts/smoke_test.py \
-  --run-notebook \
-  --model-dir /abs/path/to/ChemBERTa \
-  --data-path /abs/path/to/smiles_signatures.parquet
-```
-
-Enable checker in reduced smoke only when desired:
-
-```bash
-python scripts/smoke_test.py \
-  --run-notebook \
-  --run-checker \
-  --model-dir /abs/path/to/ChemBERTa \
-  --data-path /abs/path/to/smiles_signatures.parquet
-```
-
-## Reproducibility Notes
-
-- Use fixed seeds and explicit paths via environment variables or CLI args.
+- Use fixed seeds and explicit paths via environment variables or CLI arguments.
 - For archival reproducibility, record split indices and checkpoint SHA256.
-- For CPU-only runs, expect longer runtime and small numeric drift versus GPU runs.
+- CPU-only runs are expected to be slower and may show small numeric drift relative to GPU runs.
+- The **dGSEA-only** setting is included as an ablation. For faithful transcriptome prediction, the **hybrid objective** is the recommended setting.
 
 ## Citation
 
-See `CITATION.cff`.
+If you use this repository, please cite the paper. See `CITATION.cff`.
 
 ## License
 
